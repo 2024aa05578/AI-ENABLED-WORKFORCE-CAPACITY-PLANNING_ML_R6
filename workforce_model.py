@@ -2,6 +2,7 @@ import pandas as pd
 import math
 
 
+
 def calculate_workforce(
     df,
     bu_parameters,
@@ -10,6 +11,7 @@ def calculate_workforce(
     working_days,
     target_utilization
 ):
+
 
     results = []
 
