@@ -3,7 +3,7 @@ import pandas as pd
 from workforce_model import calculate_workforce
 
 # =====================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # =====================================================
 
 st.set_page_config(
@@ -13,10 +13,10 @@ st.set_page_config(
 )
 
 # =====================================================
-# REGION WISE GROWTH
+# REGION GROWTH
 # =====================================================
 
-st.sidebar.header("📈 North Region Growth")
+st.sidebar.header("📈 Region Wise Growth")
 
 north_bau = st.sidebar.slider(
     "North BAU Growth %",
@@ -30,8 +30,6 @@ north_dc = st.sidebar.slider(
     key="north_dc"
 )
 
-st.sidebar.header("📈 West Region Growth")
-
 west_bau = st.sidebar.slider(
     "West BAU Growth %",
     0, 100, 20,
@@ -43,8 +41,6 @@ west_dc = st.sidebar.slider(
     0, 100, 40,
     key="west_dc"
 )
-
-st.sidebar.header("📈 South Region Growth")
 
 south_bau = st.sidebar.slider(
     "South BAU Growth %",
@@ -58,6 +54,16 @@ south_dc = st.sidebar.slider(
     key="south_dc"
 )
 
-st.sidebar.header("📈 East Region Growth")
-
 east_bau = st.sidebar.slider(
+    "East BAU Growth %",
+    0, 100, 10,
+    key="east_bau"
+)
+
+east_dc = st.sidebar.slider(
+    "East DC Growth %",
+    0, 100, 5,
+    key="east_dc"
+)
+
+region_parameters = {
