@@ -5,6 +5,7 @@ import math
 def calculate_workforce(
     df,
     bu_parameters,
+    region_dc_growth,
     productive_hours,
     working_days,
     target_utilization
@@ -12,14 +13,12 @@ def calculate_workforce(
 
     results = []
 
-    # Annual engineer capacity
     annual_capacity = (
         productive_hours *
         working_days *
         12
     )
 
-    # Effective capacity after utilization
     effective_capacity = (
         annual_capacity *
         target_utilization / 100
@@ -28,6 +27,7 @@ def calculate_workforce(
     for _, row in df.iterrows():
 
         product = row["Product"]
+        region = row["Region"]
 
         params = bu_parameters.get(
             product,
@@ -39,52 +39,55 @@ def calculate_workforce(
         )
 
         bau_growth = params["BAU"]
-        dc_growth = params["DC"]
+        bu_dc_growth = params["DC"]
         attrition = params["Attrition"]
 
-        # Current workload hours
-
-        current_hours = (
-            row["Breakdown_WO"] * row["Breakdown_Hrs"]
-            +
-            row["PM_WO"] * row["PM_Hrs"]
-            +
-            row["Startup_WO"] * row["Startup_Hrs"]
+        regional_dc = region_dc_growth.get(
+            region,
+            0
         )
 
-        # Future workload
+        current_hours = (
+            row["Breakdown_WO"] *
+            row["Breakdown_Hrs"]
+            +
+            row["PM_WO"] *
+            row["PM_Hrs"]
+            +
+            row["Startup_WO"] *
+            row["Startup_Hrs"]
+        )
 
         future_hours = (
-            current_hours *
+            current_hours
+            *
             (
                 1
                 + (bau_growth / 100)
-                + (dc_growth / 100)
+                + (bu_dc_growth / 100)
+                + (regional_dc / 100)
             )
         )
 
-        # Required engineers
-
         required_engineers = (
-            future_hours /
+            future_hours
+            /
             effective_capacity
         )
 
-        # Available engineers after attrition
-
         available_engineers = (
-            row["Current_SE"] *
+            row["Current_SE"]
+            *
             (
-                1 -
-                (attrition / 100)
+                1
+                - (attrition / 100)
             )
         )
 
-        # Hiring requirement
-
         additional_required = max(
             math.ceil(
-                required_engineers -
+                required_engineers
+                -
                 available_engineers
             ),
             0
@@ -93,16 +96,19 @@ def calculate_workforce(
         results.append({
 
             "Region":
-            row["Region"],
+            region,
 
             "Product":
-            row["Product"],
+            product,
 
             "BAU Growth %":
             bau_growth,
 
-            "DC Surge %":
-            dc_growth,
+            "BU DC Growth %":
+            bu_dc_growth,
+
+            "Regional DC Growth %":
+            regional_dc,
 
             "Attrition %":
             attrition,
