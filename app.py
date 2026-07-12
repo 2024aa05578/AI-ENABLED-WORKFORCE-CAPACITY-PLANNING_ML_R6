@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =====================================================
-# SIDEBAR
+# SIDEBAR PARAMETERS
 # =====================================================
 
 st.sidebar.title("BU Wise Planning Parameters")
@@ -27,28 +27,19 @@ bu_parameters = {}
 with st.sidebar.expander("UPS", expanded=True):
 
     bu_parameters["UPS"] = {
-
         "BAU": st.slider(
             "UPS BAU Growth %",
-            0,
-            100,
-            25,
+            0, 100, 25,
             key="ups_bau"
         ),
-
         "DC": st.slider(
-            "UPS Data Center Surge %",
-            0,
-            100,
-            40,
+            "UPS Data Center Growth %",
+            0, 100, 40,
             key="ups_dc"
         ),
-
         "Attrition": st.slider(
             "UPS Attrition %",
-            0,
-            30,
-            8,
+            0, 30, 8,
             key="ups_attr"
         )
     }
@@ -58,28 +49,19 @@ with st.sidebar.expander("UPS", expanded=True):
 with st.sidebar.expander("Cooling"):
 
     bu_parameters["Cooling"] = {
-
         "BAU": st.slider(
             "Cooling BAU Growth %",
-            0,
-            100,
-            20,
+            0, 100, 20,
             key="cool_bau"
         ),
-
         "DC": st.slider(
-            "Cooling Data Center Surge %",
-            0,
-            100,
-            50,
+            "Cooling Data Center Growth %",
+            0, 100, 50,
             key="cool_dc"
         ),
-
         "Attrition": st.slider(
             "Cooling Attrition %",
-            0,
-            30,
-            8,
+            0, 30, 8,
             key="cool_attr"
         )
     }
@@ -89,28 +71,19 @@ with st.sidebar.expander("Cooling"):
 with st.sidebar.expander("Power Products"):
 
     bu_parameters["Power Products"] = {
-
         "BAU": st.slider(
             "Power Products BAU Growth %",
-            0,
-            100,
-            15,
+            0, 100, 15,
             key="pp_bau"
         ),
-
         "DC": st.slider(
             "Power Products DC Growth %",
-            0,
-            100,
-            10,
+            0, 100, 10,
             key="pp_dc"
         ),
-
         "Attrition": st.slider(
             "Power Products Attrition %",
-            0,
-            30,
-            8,
+            0, 30, 8,
             key="pp_attr"
         )
     }
@@ -120,28 +93,19 @@ with st.sidebar.expander("Power Products"):
 with st.sidebar.expander("Power System"):
 
     bu_parameters["Power System"] = {
-
         "BAU": st.slider(
             "Power System BAU Growth %",
-            0,
-            100,
-            18,
+            0, 100, 18,
             key="ps_bau"
         ),
-
         "DC": st.slider(
             "Power System DC Growth %",
-            0,
-            100,
-            20,
+            0, 100, 20,
             key="ps_dc"
         ),
-
         "Attrition": st.slider(
             "Power System Attrition %",
-            0,
-            30,
-            8,
+            0, 30, 8,
             key="ps_attr"
         )
     }
@@ -151,28 +115,19 @@ with st.sidebar.expander("Power System"):
 with st.sidebar.expander("Industrial Automation"):
 
     bu_parameters["Industrial Automation"] = {
-
         "BAU": st.slider(
             "Industrial Automation BAU Growth %",
-            0,
-            100,
-            12,
+            0, 100, 12,
             key="ia_bau"
         ),
-
         "DC": st.slider(
             "Industrial Automation DC Growth %",
-            0,
-            100,
-            5,
+            0, 100, 5,
             key="ia_dc"
         ),
-
         "Attrition": st.slider(
             "Industrial Automation Attrition %",
-            0,
-            30,
-            8,
+            0, 30, 8,
             key="ia_attr"
         )
     }
@@ -205,13 +160,13 @@ target_utilization = st.sidebar.slider(
 )
 
 # =====================================================
-# MAIN PAGE
+# MAIN HEADER
 # =====================================================
 
 st.title("🚀 AI Enabled Workforce & Capacity Planning")
 
 st.markdown("""
-This solution forecasts workforce requirements using:
+This solution forecasts manpower demand using:
 
 - Installed Base
 - Breakdown Work Orders
@@ -220,34 +175,33 @@ This solution forecasts workforce requirements using:
 - BAU Growth
 - Data Center Growth
 - Attrition
-- Engineer Productivity
-- Engineer Utilization
-- Machine Learning Forecasting
+- Productivity
+- Utilization
+- Machine Learning Based Forecasting
 """)
 
 # =====================================================
-# LOAD WORKFORCE DATA
+# SECTION 1
+# WORKFORCE INPUT
 # =====================================================
 
-uploaded_file = st.file_uploader(
+st.header("📂 Step 1 - Upload Workforce Data")
+
+workforce_file = st.file_uploader(
     "Upload workforce_input.csv",
     type=["csv"]
 )
 
-if uploaded_file is not None:
+if workforce_file is not None:
 
-    df = pd.read_csv(uploaded_file)
+    df = pd.read_csv(workforce_file)
 
-    st.subheader("Input Data")
+    st.subheader("Workforce Input Data")
 
     st.dataframe(
         df,
         use_container_width=True
     )
-
-    # =====================================================
-    # WORKFORCE CALCULATION
-    # =====================================================
 
     result = calculate_workforce(
         df,
@@ -264,9 +218,7 @@ if uploaded_file is not None:
         use_container_width=True
     )
 
-    # =====================================================
     # KPI SECTION
-    # =====================================================
 
     total_current = df["Current_SE"].sum()
 
@@ -284,10 +236,10 @@ if uploaded_file is not None:
         result["Additional Required"].sum()
     )
 
-    c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
+    c1, c2, c3, c4 = st.columns(4)
 
     c1.metric(
-        "Current SE",
+        "Current Engineers",
         total_current
     )
 
@@ -306,24 +258,7 @@ if uploaded_file is not None:
         total_hiring
     )
 
-    c5.metric(
-        "Hrs/Day",
-        productive_hours
-    )
-
-    c6.metric(
-        "Days/Month",
-        working_days
-    )
-
-    c7.metric(
-        "Utilization %",
-        target_utilization
-    )
-
-    # =====================================================
-    # HIRING BY BU
-    # =====================================================
+    # BU Chart
 
     st.subheader("📦 Hiring Requirement by Business Unit")
 
@@ -335,9 +270,7 @@ if uploaded_file is not None:
 
     st.bar_chart(product_summary)
 
-    # =====================================================
-    # HIRING BY REGION
-    # =====================================================
+    # Region Chart
 
     st.subheader("🌍 Hiring Requirement by Region")
 
@@ -349,13 +282,11 @@ if uploaded_file is not None:
 
     st.bar_chart(region_summary)
 
-    # =====================================================
-    # PRODUCT REGION MATRIX
-    # =====================================================
+    # Matrix
 
-    st.subheader("📊 Product vs Region Hiring Matrix")
+    st.subheader("📊 Product vs Region Matrix")
 
-    matrix = result.pivot_table(
+    pivot = result.pivot_table(
         values="Additional Required",
         index="Product",
         columns="Region",
@@ -364,48 +295,57 @@ if uploaded_file is not None:
     )
 
     st.dataframe(
-        matrix,
+        pivot,
         use_container_width=True
     )
 
-    # =====================================================
-    # MACHINE LEARNING FORECAST
-    # =====================================================
+# =====================================================
+# SECTION 2
+# ML FORECAST
+# =====================================================
 
-    st.subheader("📈 Machine Learning Forecast")
+st.header("📈 Step 2 - ML Forecast")
 
-    try:
+historical_file = st.file_uploader(
+    "Upload historical_workload.csv",
+    type=["csv"],
+    key="historical_file"
+)
 
-        historical_df = pd.read_csv(
-            "data/historical_workload.csv"
-        )
+if historical_file is not None:
 
-        selected_product = st.selectbox(
-            "Select Product",
-            historical_df["Product"].unique()
-        )
+    historical_df = pd.read_csv(
+        historical_file
+    )
 
-        forecast_df = forecast_work_orders(
-            historical_df,
-            selected_product
-        )
+    st.subheader("Historical Data")
 
-        st.dataframe(
-            forecast_df,
-            use_container_width=True
-        )
+    st.dataframe(
+        historical_df,
+        use_container_width=True
+    )
 
-    except Exception as e:
+    selected_product = st.selectbox(
+        "Select Product",
+        historical_df["Product"].unique()
+    )
 
-        st.warning(
-            "historical_workload.csv not found. "
-            "ML forecast section skipped."
-        )
+    forecast_df = forecast_work_orders(
+        historical_df,
+        selected_product
+    )
 
-        st.text(str(e))
+    st.subheader(
+        f"Future Forecast for {selected_product}"
+    )
+
+    st.dataframe(
+        forecast_df,
+        use_container_width=True
+    )
 
 else:
 
     st.info(
-        "Upload workforce_input.csv to start planning."
+        "Upload historical_workload.csv to run Machine Learning forecasting."
     )
