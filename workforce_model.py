@@ -4,8 +4,8 @@ import pandas as pd
 
 def calculate_workforce(
     df,
-    bu_parameters,
-    regional_dc_growth,
+    growth_parameters,
+    attrition_parameters,
     productive_hours,
     working_days,
     target_utilization
@@ -19,31 +19,20 @@ def calculate_workforce(
         region = row["Region"]
         product = row["Product"]
 
-        params = bu_parameters.get(
+        region_product_params = growth_parameters.get(region, {}).get(
             product,
             {
                 "BAU": 20,
-                "Attrition": 8,
-                "DC_Action": "Add Regional DC Growth"
+                "DC": 0
             }
         )
 
-        bau_growth = params["BAU"]
-        attrition = params["Attrition"]
-        dc_action = params["DC_Action"]
+        bau_growth = region_product_params["BAU"]
+        dc_growth = region_product_params["DC"]
 
-        region_dc_growth = regional_dc_growth.get(region, 0)
+        attrition = attrition_parameters.get(product, 8)
 
-        if dc_action == "Add Regional DC Growth":
-            applied_dc_growth = region_dc_growth
-        elif dc_action == "Do Not Add Regional DC Growth":
-            applied_dc_growth = 0
-        elif dc_action == "Delete Regional DC Growth":
-            applied_dc_growth = -region_dc_growth
-        else:
-            applied_dc_growth = 0
-
-        total_growth = bau_growth + applied_dc_growth
+        total_growth = bau_growth + dc_growth
 
         current_hours = (
             row["Breakdown_WO"] * row["Breakdown_Hrs"]
@@ -67,9 +56,7 @@ def calculate_workforce(
                 "Region": region,
                 "Product": product,
                 "BAU Growth %": bau_growth,
-                "Regional DC Growth %": region_dc_growth,
-                "BU DC Action": dc_action,
-                "Applied DC Growth %": applied_dc_growth,
+                "DC Growth %": dc_growth,
                 "Total Growth %": total_growth,
                 "Attrition %": attrition,
                 "Productive Hrs/Day": productive_hours,
