@@ -1,0 +1,21 @@
+Year,Product,Breakdown_WO,PM_WO,Startup_WO
+2023,UPS,10897,2500,1605
+2024,UPS,14016,2800,2892
+2025,UPS,15038,3000,2223
+
+2023,Cooling,3601,500,707
+2024,Cooling,3035,550,649
+2025,Cooling,3035,607,799
+
+2023,Power Products,585,150,65
+2024,Power Products,800,180,75
+2025,Power Products,1354,203,89
+
+2023,Power System,711,60,1527
+2024,Power System,650,75,1600
+2025,Power System,547,82,1656
+
+2023,Industrial Automation,912,60,99
+2024,Industrial Automation,720,75,92
+2025,Industrial Automation,607,91,82
+``
