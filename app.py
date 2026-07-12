@@ -16,209 +16,105 @@ st.set_page_config(
 
 
 # =====================================================
-# REGIONAL DATA CENTER GROWTH PARAMETERS
+# MASTER DATA
 # =====================================================
 
-st.sidebar.title("Regional Data Center Growth")
-
-regional_dc_growth = {}
-
-with st.sidebar.expander("Regional DC Growth %", expanded=True):
-    regional_dc_growth["North"] = st.slider(
-        "North DC Growth %",
-        min_value=0,
-        max_value=100,
-        value=25,
-        key="north_dc"
-    )
-
-    regional_dc_growth["South"] = st.slider(
-        "South DC Growth %",
-        min_value=0,
-        max_value=100,
-        value=40,
-        key="south_dc"
-    )
-
-    regional_dc_growth["East"] = st.slider(
-        "East DC Growth %",
-        min_value=0,
-        max_value=100,
-        value=15,
-        key="east_dc"
-    )
-
-    regional_dc_growth["West"] = st.slider(
-        "West DC Growth %",
-        min_value=0,
-        max_value=100,
-        value=35,
-        key="west_dc"
-    )
-
-
-# =====================================================
-# BU WISE PARAMETERS
-# =====================================================
-
-st.sidebar.title("BU Wise Planning Parameters")
-
-dc_action_options = [
-    "Add Regional DC Growth",
-    "Do Not Add Regional DC Growth",
-    "Delete Regional DC Growth"
+REGIONS = [
+    "North",
+    "South",
+    "East",
+    "West"
 ]
 
-bu_parameters = {}
+PRODUCTS = [
+    "UPS",
+    "Cooling",
+    "Power Products",
+    "Power System",
+    "Industrial Automation"
+]
 
 
 # =====================================================
-# UPS
+# SIDEBAR - REGION AND PRODUCT WISE BUSINESS GROWTH
 # =====================================================
 
-with st.sidebar.expander("UPS", expanded=True):
-    bu_parameters["UPS"] = {
-        "BAU": st.slider(
-            "UPS BAU Growth %",
-            min_value=0,
-            max_value=100,
-            value=25,
-            key="ups_bau"
-        ),
-        "Attrition": st.slider(
-            "UPS Attrition %",
-            min_value=0,
-            max_value=30,
-            value=8,
-            key="ups_attr"
-        ),
-        "DC_Action": st.selectbox(
-            "UPS Regional DC Treatment",
-            dc_action_options,
-            index=0,
-            key="ups_dc_action"
-        )
-    }
+st.sidebar.title("Region Wise Business Growth")
 
+growth_parameters = {}
 
-# =====================================================
-# COOLING
-# =====================================================
+default_bau = {
+    "UPS": 25,
+    "Cooling": 20,
+    "Power Products": 15,
+    "Power System": 18,
+    "Industrial Automation": 12
+}
 
-with st.sidebar.expander("Cooling"):
-    bu_parameters["Cooling"] = {
-        "BAU": st.slider(
-            "Cooling BAU Growth %",
-            min_value=0,
-            max_value=100,
-            value=20,
-            key="cool_bau"
-        ),
-        "Attrition": st.slider(
-            "Cooling Attrition %",
-            min_value=0,
-            max_value=30,
-            value=8,
-            key="cool_attr"
-        ),
-        "DC_Action": st.selectbox(
-            "Cooling Regional DC Treatment",
-            dc_action_options,
-            index=0,
-            key="cool_dc_action"
-        )
-    }
+default_dc = {
+    "UPS": 40,
+    "Cooling": 50,
+    "Power Products": 10,
+    "Power System": 20,
+    "Industrial Automation": 5
+}
 
+for region in REGIONS:
+    growth_parameters[region] = {}
 
-# =====================================================
-# POWER PRODUCTS
-# =====================================================
+    with st.sidebar.expander(f"{region} Business Growth", expanded=(region == "North")):
+        st.markdown("### BAU Growth")
 
-with st.sidebar.expander("Power Products"):
-    bu_parameters["Power Products"] = {
-        "BAU": st.slider(
-            "Power Products BAU Growth %",
-            min_value=0,
-            max_value=100,
-            value=15,
-            key="pp_bau"
-        ),
-        "Attrition": st.slider(
-            "Power Products Attrition %",
-            min_value=0,
-            max_value=30,
-            value=8,
-            key="pp_attr"
-        ),
-        "DC_Action": st.selectbox(
-            "Power Products Regional DC Treatment",
-            dc_action_options,
-            index=1,
-            key="pp_dc_action"
-        )
-    }
+        for product in PRODUCTS:
+            bau_value = st.slider(
+                f"{region} - {product} BAU Growth %",
+                min_value=0,
+                max_value=100,
+                value=default_bau[product],
+                key=f"{region}_{product}_bau"
+            )
+
+            growth_parameters[region][product] = {
+                "BAU": bau_value,
+                "DC": 0
+            }
+
+        st.markdown("---")
+        st.markdown("### DC Growth")
+
+        for product in PRODUCTS:
+            dc_value = st.slider(
+                f"{region} - {product} DC Growth %",
+                min_value=-100,
+                max_value=100,
+                value=default_dc[product],
+                key=f"{region}_{product}_dc"
+            )
+
+            growth_parameters[region][product]["DC"] = dc_value
 
 
 # =====================================================
-# POWER SYSTEM
+# SIDEBAR - ATTRITION PARAMETERS
 # =====================================================
 
-with st.sidebar.expander("Power System"):
-    bu_parameters["Power System"] = {
-        "BAU": st.slider(
-            "Power System BAU Growth %",
-            min_value=0,
-            max_value=100,
-            value=18,
-            key="ps_bau"
-        ),
-        "Attrition": st.slider(
-            "Power System Attrition %",
+st.sidebar.title("BU Wise Attrition")
+
+attrition_parameters = {}
+
+with st.sidebar.expander("Attrition %", expanded=False):
+    for product in PRODUCTS:
+        attrition_parameters[product] = st.slider(
+            f"{product} Attrition %",
             min_value=0,
             max_value=30,
             value=8,
-            key="ps_attr"
-        ),
-        "DC_Action": st.selectbox(
-            "Power System Regional DC Treatment",
-            dc_action_options,
-            index=0,
-            key="ps_dc_action"
+            key=f"{product}_attrition"
         )
-    }
 
 
 # =====================================================
-# INDUSTRIAL AUTOMATION
-# =====================================================
-
-with st.sidebar.expander("Industrial Automation"):
-    bu_parameters["Industrial Automation"] = {
-        "BAU": st.slider(
-            "Industrial Automation BAU Growth %",
-            min_value=0,
-            max_value=100,
-            value=12,
-            key="ia_bau"
-        ),
-        "Attrition": st.slider(
-            "Industrial Automation Attrition %",
-            min_value=0,
-            max_value=30,
-            value=8,
-            key="ia_attr"
-        ),
-        "DC_Action": st.selectbox(
-            "Industrial Automation Regional DC Treatment",
-            dc_action_options,
-            index=1,
-            key="ia_dc_action"
-        )
-    }
-
-
-# =====================================================
-# WORKFORCE PRODUCTIVITY PARAMETERS
+# SIDEBAR - PRODUCTIVITY PARAMETERS
 # =====================================================
 
 st.sidebar.title("Workforce Productivity")
@@ -258,10 +154,12 @@ st.write(
     - Current service engineer count
     - Breakdown, preventive maintenance and startup work orders
     - Average hours per work order type
-    - BU-wise BAU growth
-    - Region-wise Data Center growth
-    - BU-wise option to add, ignore, or delete regional DC growth
-    - Attrition
+    - Region-wise and product-wise BAU growth
+    - Region-wise and product-wise DC growth
+    - Positive DC growth adds business load
+    - Zero DC growth ignores DC impact
+    - Negative DC growth deletes/reduces DC impact
+    - BU-wise attrition
     - Engineer productivity assumptions
     """
 )
@@ -302,8 +200,8 @@ if uploaded_file is not None:
 
     result = calculate_workforce(
         df,
-        bu_parameters,
-        regional_dc_growth,
+        growth_parameters,
+        attrition_parameters,
         productive_hours,
         working_days,
         target_utilization
@@ -350,19 +248,7 @@ if uploaded_file is not None:
 
     st.bar_chart(hiring_by_region)
 
-    st.subheader("🏢 Applied DC Growth by Product and Region")
-
-    dc_matrix = result.pivot_table(
-        values="Applied DC Growth %",
-        index="Product",
-        columns="Region",
-        fill_value=0,
-        aggfunc="mean"
-    )
-
-    st.dataframe(dc_matrix, use_container_width=True)
-
-    st.subheader("📊 Product vs Region Hiring Matrix")
+    st.subheader("📊 Hiring Matrix - Product vs Region")
 
     hiring_matrix = result.pivot_table(
         values="Additional Required",
@@ -374,26 +260,32 @@ if uploaded_file is not None:
 
     st.dataframe(hiring_matrix, use_container_width=True)
 
-    st.subheader("📈 Total Growth by Product and Region")
+    st.subheader("📈 BAU Growth Matrix")
 
-    growth_matrix = result.pivot_table(
-        values="Total Growth %",
+    bau_matrix = result.pivot_table(
+        values="BAU Growth %",
         index="Product",
         columns="Region",
         fill_value=0,
         aggfunc="mean"
     )
 
-    st.dataframe(growth_matrix, use_container_width=True)
+    st.dataframe(bau_matrix, use_container_width=True)
 
-    csv_output = result.to_csv(index=False).encode("utf-8")
+    st.subheader("🏢 DC Growth Matrix")
 
-    st.download_button(
-        label="Download Workforce Planning Output",
-        data=csv_output,
-        file_name="workforce_planning_output.csv",
-        mime="text/csv"
+    dc_matrix = result.pivot_table(
+        values="DC Growth %",
+        index="Product",
+        columns="Region",
+        fill_value=0,
+        aggfunc="mean"
     )
 
-else:
-    st.info("Please upload workforce_input.csv to start workforce planning.")
+    st.dataframe(dc_matrix, use_container_width=True)
+
+    st.subheader("📈 Total Growth Matrix")
+
+    growth_matrix = result.pivot_table(
+        values="Total Growth %",
+        index="Product",
