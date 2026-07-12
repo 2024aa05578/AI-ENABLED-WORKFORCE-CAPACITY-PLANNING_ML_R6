@@ -27,51 +27,50 @@ def calculate_workforce(
     for _, row in df.iterrows():
 
         product = row["Product"]
+
         region = row["Region"]
 
         params = bu_parameters.get(
             product,
             {
                 "BAU": 20,
-                "DC": 20,
                 "Attrition": 8
             }
         )
 
         bau_growth = params["BAU"]
-        bu_dc_growth = params["DC"]
+
         attrition = params["Attrition"]
 
-        regional_dc = region_dc_growth.get(
-            region,
-            0
+        regional_dc_growth = (
+            region_dc_growth.get(
+                region,
+                0
+            )
         )
 
         current_hours = (
-            row["Breakdown_WO"] *
-            row["Breakdown_Hrs"]
+            row["Breakdown_WO"]
+            * row["Breakdown_Hrs"]
             +
-            row["PM_WO"] *
-            row["PM_Hrs"]
+            row["PM_WO"]
+            * row["PM_Hrs"]
             +
-            row["Startup_WO"] *
-            row["Startup_Hrs"]
+            row["Startup_WO"]
+            * row["Startup_Hrs"]
         )
 
         future_hours = (
-            current_hours
-            *
+            current_hours *
             (
                 1
-                + (bau_growth / 100)
-                + (bu_dc_growth / 100)
-                + (regional_dc / 100)
+                + bau_growth / 100
+                + regional_dc_growth / 100
             )
         )
 
         required_engineers = (
-            future_hours
-            /
+            future_hours /
             effective_capacity
         )
 
@@ -80,7 +79,7 @@ def calculate_workforce(
             *
             (
                 1
-                - (attrition / 100)
+                - attrition / 100
             )
         )
 
@@ -95,38 +94,18 @@ def calculate_workforce(
 
         results.append({
 
-            "Region":
-            region,
+            "Region": region,
 
-            "Product":
-            product,
+            "Product": product,
 
             "BAU Growth %":
             bau_growth,
 
-            "BU DC Growth %":
-            bu_dc_growth,
-
             "Regional DC Growth %":
-            regional_dc,
+            regional_dc_growth,
 
             "Attrition %":
             attrition,
-
-            "Productive Hrs/Day":
-            productive_hours,
-
-            "Working Days/Month":
-            working_days,
-
-            "Utilization %":
-            target_utilization,
-
-            "Annual Capacity":
-            round(annual_capacity),
-
-            "Effective Capacity":
-            round(effective_capacity),
 
             "Current Hours":
             round(current_hours),
